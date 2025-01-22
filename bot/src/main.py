@@ -3,13 +3,16 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
 import json
+from datetime import datetime
 
 from contextlib import asynccontextmanager
 
 from langchain_community.llms import Cohere
 from langchain_core.prompts import PromptTemplate
 
-from src.shared.postgres.connection import init_db, close_db, get_whitelisted_users
+from src.shared.postgres.connection import init_db, close_db, get_connection_pool
+from src.expenses.domain.expense import NewExpense
+from src.expenses.infrastructure.persistence.postgres.postgres_expense_repository import PostgresExpenseRepository
 
 load_dotenv()
 
@@ -64,11 +67,19 @@ class ExpenseRequest(BaseModel):
     user_id: int
     message: str
 
+expense = NewExpense(user=1, amount=100, category="Food", description="Pizza")
+
+def get_repo(db_pool=Depends(get_connection_pool)):
+    return PostgresExpenseRepository(db_pool)
+
+@app.post("/process")
+async def process_expense(request: ExpenseRequest):
+    msg = chain.invoke({"expense_text": request.message})
+    print(json.loads(msg))
+
+    return {"message": f"Received: {request.message}", "generated": msg}
 
 @app.get("/process")
-async def process_expense(request: ExpenseRequest):
-    # msg = chain.invoke({"expense_text": request.message})
-    # print(json.loads(msg))
+async def get_exp(request: ExpenseRequest, repo=Depends(get_repo)):
 
-    # return {"message": f"Received: {request.message}", "generated": msg}
-    return await get_whitelisted_users()
+    return await repo.add(expense)
