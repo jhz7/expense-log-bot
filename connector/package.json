@@ -4,7 +4,8 @@
   "main": "src/index.ts",
   "type": "module",
   "scripts": {
-    "start": "npx ts-node src/index.ts",
+    "start": "node --env-file=.env --experimental-transform-types src/index.ts",
+    "dev": "node --env-file=.env --experimental-transform-types --watch src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
