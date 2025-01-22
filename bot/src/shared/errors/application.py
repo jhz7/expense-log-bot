@@ -7,7 +7,9 @@ class ApplicationError(Exception):
 
 
 def NotFoundError(resource: str, attributes: dict):
-    attributes["resource"] = resource
+    copy_attributes = attributes.copy()
+    copy_attributes["resource"] = resource
+
     return ApplicationError(
-        "RESOURCE_NOT_FOUND", f"The resource {resource} was not found", attributes
+        "ResourceNotFoundError", f"The resource {resource} was not found", copy_attributes
     )

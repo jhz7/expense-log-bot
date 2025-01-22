@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
@@ -9,13 +9,12 @@ from contextlib import asynccontextmanager
 from langchain_community.llms import Cohere
 from langchain_core.prompts import PromptTemplate
 
-import asyncio
-from src.database import init_db, close_db, get_whitelisted_users
+from src.shared.postgres.connection import init_db, close_db, get_whitelisted_users
 
 load_dotenv()
 
 
-cohere_api_key=os.environ.get("COHERE_API_KEY")
+cohere_api_key = os.environ.get("COHERE_API_KEY")
 model = Cohere(cohere_api_key=cohere_api_key, max_tokens=256, temperature=0.75)
 prompt = PromptTemplate(
     input_variables=["expense_text"],
@@ -44,9 +43,10 @@ prompt = PromptTemplate(
         amount: 20,
         category: Food
     }}
-    """
+    """,
 )
 chain = prompt | model
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -56,21 +56,15 @@ async def lifespan(app: FastAPI):
     # Clean up the ML models and release the resources
     await close_db()
 
+
 app = FastAPI(lifespan=lifespan)
+
 
 class ExpenseRequest(BaseModel):
     user_id: int
     message: str
 
 
-# @app.on_event("startup")
-# async def startup_event():
-#     await init_db()
-
-# @app.on_event("shutdown")
-# async def shutdown_event():
-#     await close_db()
-    
 @app.get("/process")
 async def process_expense(request: ExpenseRequest):
     # msg = chain.invoke({"expense_text": request.message})

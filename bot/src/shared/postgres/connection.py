@@ -1,4 +1,6 @@
 import asyncpg
+from asyncpg import Pool
+
 import os
 from dotenv import load_dotenv
 
@@ -15,6 +17,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
 # Connection Pool
 db_pool = None
 
+
 async def init_db():
     global db_pool
     db_pool = await asyncpg.create_pool(
@@ -24,9 +27,10 @@ async def init_db():
         host=DB_HOST,
         port=DB_PORT,
         min_size=1,  # Minimum number of connections
-        max_size=10  # Maximum number of connections
+        max_size=10,  # Maximum number of connections
     )
     print("✅ Database connected successfully!")
+
 
 async def close_db():
     global db_pool
@@ -34,17 +38,9 @@ async def close_db():
         await db_pool.close()
         print("🔌 Database connection closed")
 
-async def get_whitelisted_users():
-    global db_pool
-    async with db_pool.acquire() as conn:
-        rows = await conn.fetch("SELECT id, telegram_id FROM users")
-        print(rows)
-        return {row["telegram_id"] for row in rows}
-    
-async def add_expense(user_id: int, description: str, amount: float, category: str):
-    global db_pool
-    async with db_pool.acquire() as conn:
-        await conn.execute(
-            "INSERT INTO expenses (user_id, description, amount, category, added_at) VALUES ($1, $2, $3, $4, NOW())",
-            user_id, description, amount, category
-        )
+
+async def get_connection_pool() -> Pool:
+    if db_pool is None:
+        raise Exception("Database pool is not initialized")
+
+    return db_pool

@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from src.expenses.domain import NewExpense
+from src.expenses.domain.expense import NewExpense
 
 
 class ExpenseRepository(ABC):
