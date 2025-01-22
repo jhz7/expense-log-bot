@@ -17,16 +17,16 @@ class PostgresExpenseRepository(ExpenseRepository):
                 async with connection.transaction():
                     await connection.execute(
                         "INSERT INTO expenses (user_id, amount, category, description, added_at) VALUES ($1, $2, $3, $4, $5)",
-                        expense.user,
-                        str(expense.amount),
-                        expense.category,
-                        expense.description,
+                        expense.user_id,
+                        str(expense.details.amount),
+                        expense.details.category,
+                        expense.details.description,
                         expense.at,
                     )
         except Exception as e:
             error = TechnicalError(
                 code="ExpenseRepositoryError",
-                message=f"Fail adding a new expense for user {expense.user}",
+                message=f"Fail adding a new expense for user {expense.user_id}",
                 attributes=expense.__dict__,
                 cause=e,
             )
