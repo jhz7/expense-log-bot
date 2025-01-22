@@ -1,5 +1,5 @@
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
 from asyncio.threads import to_thread
 from langchain_community.llms.cohere import Cohere
 from langchain_core.prompts import PromptTemplate
@@ -9,24 +9,24 @@ from src.shared.errors.technical import TechnicalError
 from src.shared.logging.log import Logger
 
 load_dotenv()
+__cohere_api_key = os.environ.get("COHERE_API_KEY")
+model = Cohere(cohere_api_key=__cohere_api_key, max_tokens=256, temperature=0.75)
 
 logger = Logger(__name__)
 
 
 class LangChainCohereTextGenerator(LLM):
-
-    def __init__(self):
-        cohere_api_key = os.environ.get("COHERE_API_KEY")
-        self.__model = Cohere(
-            cohere_api_key=cohere_api_key, max_tokens=256, temperature=0.75
-        )
-
     async def generate(self, prompt: str, input: dict) -> str:
         try:
-            chain = self.__build_prompt_template(prompt, input) | self.__model
+            prompt_template = PromptTemplate(
+                template=prompt,
+                input_variables=list(input.keys()),
+            )
+            chain = prompt_template | model
+
             msg = await to_thread(chain.invoke, input)
 
-            print(f"Generated text: text={msg} input={input}")
+            logger.debug(f"Generated text: text={msg} input={input}")
 
             return msg
         except Exception as e:
@@ -40,9 +40,3 @@ class LangChainCohereTextGenerator(LLM):
             logger.error(error)
 
             raise error from e
-
-    def __build_prompt_template(self, prompt: str, input: dict) -> PromptTemplate:
-        return PromptTemplate(
-            template=prompt,
-            input_variables=list(input.keys()),
-        )

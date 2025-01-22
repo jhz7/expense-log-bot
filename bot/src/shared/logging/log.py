@@ -1,9 +1,7 @@
 import logging
 
-format = "%(asctime)s - %(levelname)s - %(message)s"
+format = "%(asctime)s - %(levelname)s - %(name)s - %(message)s"
 
-logging.basicConfig(format=format, level=logging.ERROR)
-logging.basicConfig(format=format, level=logging.INFO)
 logging.basicConfig(format=format, level=logging.DEBUG)
 
 

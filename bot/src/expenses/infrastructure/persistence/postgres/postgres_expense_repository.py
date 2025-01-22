@@ -11,18 +11,20 @@ class PostgresExpenseRepository(ExpenseRepository):
     def __init__(self, db_pool: Pool):
         self.db_pool = db_pool
 
-    async def add(self, expense: NewExpense) -> None:
+    async def add(self, expense: NewExpense) -> int:
         try:
             async with self.db_pool.acquire() as connection:
                 async with connection.transaction():
-                    await connection.execute(
-                        "INSERT INTO expenses (user_id, amount, category, description, added_at) VALUES ($1, $2, $3, $4, $5)",
+                    inserted_id = await connection.fetchval(
+                        "INSERT INTO expenses (user_id, amount, category, description, added_at) VALUES ($1, $2, $3, $4, $5) RETURNING id",
                         expense.user_id,
                         str(expense.details.amount),
                         expense.details.category.name,
                         expense.details.description,
                         expense.at,
                     )
+
+                    return inserted_id
         except Exception as e:
             error = TechnicalError(
                 code="ExpenseRepositoryError",

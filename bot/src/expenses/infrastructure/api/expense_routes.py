@@ -6,13 +6,18 @@ from src.users.infrastructure.persistence.postgres.postgres_user_repository impo
     PostgresUserRepository,
 )
 
-from src.expenses.use_cases.register_user_expense import RegisterUserExpense
+from src.expenses.use_cases.register_user_expense import (
+    RegisterUserExpense,
+    RegisterUserExpenseRequest,
+)
 from src.expenses.use_cases.services.expense_details_from_message import (
     GetExpenseDetails,
-    Message,
 )
 from src.expenses.infrastructure.persistence.postgres.postgres_expense_repository import (
     PostgresExpenseRepository,
+)
+from src.expenses.infrastructure.persistence.postgres.postgres_message_process_repository import (
+    PostgresMessageProcessRepository,
 )
 
 from src.shared.postgres.connection import get_connection_pool
@@ -36,6 +41,11 @@ def get_expenses_details_service(llm=Depends(LangChainCohereTextGenerator)):
     return expenses_details_service
 
 
+def get_messages_repository(db_pool=Depends(get_connection_pool)):
+    messages_repository = PostgresMessageProcessRepository(db_pool)
+    return messages_repository
+
+
 router = APIRouter()
 
 
@@ -49,15 +59,17 @@ async def register_expense(
     request: ExpenseLogRequest,
     user_query=Depends(get_user_query_handler),
     expenses_repository=Depends(get_expenses_repository),
+    messages_repository=Depends(get_messages_repository),
     expense_details_service=Depends(get_expenses_details_service),
 ):
-    message = Message(
-        content=request.message, user_external_id=request.user_external_id
+    message = RegisterUserExpenseRequest(
+        message=request.message, user_external_id=request.user_external_id
     )
     service = RegisterUserExpense(
         users=user_query,
         expenses=expenses_repository,
         get_expense_details=expense_details_service,
+        messages=messages_repository,
     )
 
     expense = await service.from_message(message)

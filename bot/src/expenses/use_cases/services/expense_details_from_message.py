@@ -1,18 +1,12 @@
 import json
 import re
-from dataclasses import dataclass
 from decimal import Decimal
 
 from src.expenses.domain.expense import ExpenseDetails, ExpenseCategory
+from src.expenses.domain.message_process import Message
 from src.shared.llm.llm import LLM
 from src.shared.logging.log import Logger
 from src.shared.errors.application import ApplicationError
-
-
-@dataclass
-class Message:
-    content: str
-    user_external_id: str
 
 
 prompt = """
@@ -55,57 +49,63 @@ class GetExpenseDetails:
     def __init__(self, llm: LLM):
         self.llm = llm
 
-    async def from_message(self, message: Message) -> ExpenseDetails | None:
+    async def from_message(self, message: Message) -> ExpenseDetails | str:
         generated_data = await self.llm.generate(
             prompt, input={"expense_text": message.content}
         )
 
         try:
-            json_match = re.search(r"({.*?})", generated_data, re.DOTALL)
-            parsed_data = json.loads(json_match.group(0))
-        except Exception as e:
-            logger.error(e)
-            raise ValueError(f"Error parsing generated data {generated_data}") from e
-
-        expected_keys = {"amount", "description", "category"}
-
-        if not expected_keys.issubset(parsed_data.keys()):
-            return None
-
-        try:
+            parsed_data = self.__generated_text_to_dict(text=generated_data)
             solved = parsed_data.get("solved")
 
             if not isinstance(solved, bool):
                 raise ValueError(f"Invalid 'solved' value: {solved}")
 
             if not solved:
-                return None
+                return generated_data
 
-            amount = parsed_data.get("amount")
-            category = parsed_data.get("category")
-            description = parsed_data.get("description")
+            expected_keys = {"amount", "description", "category"}
 
-            if not isinstance(amount, (int, float, str)):
-                raise ValueError(f"Invalid 'amount' value: {amount}")
-            amount = Decimal(amount)
+            if not expected_keys.issubset(parsed_data.keys()):
+                return generated_data
 
-            if not isinstance(description, str) or not description.strip():
-                raise ValueError(f"Invalid 'description' value: {description}")
+            expense_details = self.__map_as_expense_details(parsed_data=parsed_data)
 
-            if not isinstance(category, str) or not ExpenseCategory(category.strip()):
-                raise ValueError(f"Invalid 'category' value: {category}")
-            category = ExpenseCategory(category)
-
-            return ExpenseDetails(
-                amount=amount, description=description, category=category
-            )
-        except ValueError as e:
+            return expense_details
+        except Exception as e:
             error = ApplicationError(
                 code="ExpenseDetailsError",
-                message="Error parsing generated data",
-                attributes=parsed_data,
+                message=str(e),
+                attributes={"text": generated_data},
             )
 
             logger.error(error)
 
             raise error from e
+
+    def __generated_text_to_dict(self, text: str) -> dict:
+        try:
+            json_match = re.search(r"({.*?})", text, re.DOTALL)
+            parsed_data = json.loads(json_match.group(0))
+
+            return parsed_data
+        except Exception as e:
+            logger.error(e)
+            raise ValueError(f"Error parsing generated data {text} {repr(e)}") from e
+
+    def __map_as_expense_details(self, parsed_data: dict) -> ExpenseDetails:
+        try:
+            amount = Decimal(parsed_data.get("amount"))
+        except (ValueError, TypeError) as e:
+            raise ValueError(f"Invalid amount value: {amount}") from e
+
+        description = parsed_data.get("description")
+        if not isinstance(description, str) or not description.strip():
+            raise ValueError(f"Invalid description value: {description}")
+
+        try:
+            category = ExpenseCategory(parsed_data.get("category"))
+        except Exception as e:
+            raise ValueError(f"Invalid category value: {category}") from e
+
+        return ExpenseDetails(amount=amount, description=description, category=category)
