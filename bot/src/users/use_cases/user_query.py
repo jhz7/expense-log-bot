@@ -2,7 +2,7 @@ from src.users.domain.user import User
 from src.users.domain.user_repository import UserRepository
 
 
-class UserQuery:
+class UserQueryHandler:
     def __init__(self, users: UserRepository):
         self.__users = users
 

@@ -19,7 +19,7 @@ class PostgresExpenseRepository(ExpenseRepository):
                         "INSERT INTO expenses (user_id, amount, category, description, added_at) VALUES ($1, $2, $3, $4, $5)",
                         expense.user_id,
                         str(expense.details.amount),
-                        expense.details.category,
+                        expense.details.category.name,
                         expense.details.description,
                         expense.at,
                     )

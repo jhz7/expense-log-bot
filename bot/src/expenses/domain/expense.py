@@ -1,6 +1,7 @@
 from enum import Enum
 from datetime import datetime
 from dataclasses import dataclass
+from decimal import Decimal
 
 
 class ExpenseCategory(Enum):
@@ -20,23 +21,12 @@ class ExpenseCategory(Enum):
 @dataclass
 class ExpenseDetails:
     description: str
-    amount: float
+    amount: Decimal
     category: ExpenseCategory
 
 
+@dataclass
 class NewExpense:
-    def __init__(
-        self,
-        user_id: int,
-        details: ExpenseDetails,
-        at: datetime = datetime.now(),
-    ):
-        self.user_id = user_id
-        self.details = details
-        self.at = at
-
-    def __str__(self):
-        return f"NewExpense(description={self.description}, amount={self.amount}, category={self.category})"
-
-    def __repr__(self):
-        return str(self)
+    user_id: int
+    details: ExpenseDetails
+    at: datetime = datetime.now()

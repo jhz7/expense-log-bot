@@ -13,7 +13,7 @@ load_dotenv()
 logger = Logger(__name__)
 
 
-class LangChainMessageAnalyzer(LLM):
+class LangChainCohereTextGenerator(LLM):
 
     def __init__(self):
         cohere_api_key = os.environ.get("COHERE_API_KEY")
@@ -23,8 +23,10 @@ class LangChainMessageAnalyzer(LLM):
 
     async def generate(self, prompt: str, input: dict) -> str:
         try:
-            chain = __build_prompt_template(prompt, input) | self.__model
+            chain = self.__build_prompt_template(prompt, input) | self.__model
             msg = await to_thread(chain.invoke, input)
+
+            print(f"Generated text: text={msg} input={input}")
 
             return msg
         except Exception as e:
@@ -39,9 +41,8 @@ class LangChainMessageAnalyzer(LLM):
 
             raise error from e
 
-
-def __build_prompt_template(prompt: str, input: dict) -> PromptTemplate:
-    return PromptTemplate(
-        template=prompt,
-        input_variables=list(input.keys()),
-    )
+    def __build_prompt_template(self, prompt: str, input: dict) -> PromptTemplate:
+        return PromptTemplate(
+            template=prompt,
+            input_variables=list(input.keys()),
+        )
