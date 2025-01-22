@@ -1,4 +1,4 @@
 class User:
-    def __init__(self, id: int, telegram_id: str):
+    def __init__(self, id: int, external_id: str):
         self.id = id
-        self.telegram_id = telegram_id
+        self.external_id = external_id

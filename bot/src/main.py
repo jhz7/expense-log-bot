@@ -12,7 +12,9 @@ from langchain_core.prompts import PromptTemplate
 
 from src.shared.postgres.connection import init_db, close_db, get_connection_pool
 from src.expenses.domain.expense import NewExpense
-from src.expenses.infrastructure.persistence.postgres.postgres_expense_repository import PostgresExpenseRepository
+from src.expenses.infrastructure.persistence.postgres.postgres_expense_repository import (
+    PostgresExpenseRepository,
+)
 
 load_dotenv()
 
@@ -53,10 +55,8 @@ chain = prompt | model
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Load the ML model
     await init_db()
     yield
-    # Clean up the ML models and release the resources
     await close_db()
 
 
@@ -67,10 +67,13 @@ class ExpenseRequest(BaseModel):
     user_id: int
     message: str
 
+
 expense = NewExpense(user=1, amount=100, category="Food", description="Pizza")
+
 
 def get_repo(db_pool=Depends(get_connection_pool)):
     return PostgresExpenseRepository(db_pool)
+
 
 @app.post("/process")
 async def process_expense(request: ExpenseRequest):
@@ -78,6 +81,7 @@ async def process_expense(request: ExpenseRequest):
     print(json.loads(msg))
 
     return {"message": f"Received: {request.message}", "generated": msg}
+
 
 @app.get("/process")
 async def get_exp(request: ExpenseRequest, repo=Depends(get_repo)):
