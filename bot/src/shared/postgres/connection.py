@@ -4,17 +4,14 @@ from asyncpg import Pool
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Database credentials from environment variables
-DB_HOST = os.getenv("DB_HOST", "localhost")
-DB_PORT = os.getenv("DB_PORT", "5432")
-DB_NAME = os.getenv("DB_NAME", "expenses_db")
-DB_USER = os.getenv("DB_USER", "postgres")
-DB_PASSWORD = os.getenv("DB_PASSWORD", "password")
+DB_HOST = os.getenv("DB_HOST")
+DB_PORT = os.getenv("DB_PORT")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 
-# Connection Pool
 db_pool = None
 
 
@@ -26,8 +23,8 @@ async def init_db():
         database=DB_NAME,
         host=DB_HOST,
         port=DB_PORT,
-        min_size=1,  # Minimum number of connections
-        max_size=10,  # Maximum number of connections
+        min_size=1,
+        max_size=10,
     )
     print("✅ Database connected successfully!")
 

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node --env-file=.env --experimental-transform-types src/index.ts",
-    "dev": "node --env-file=.env --import=tsx --watch src/index.ts",
+    "dev": "node --env-file=.dev.env --import=tsx --watch src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

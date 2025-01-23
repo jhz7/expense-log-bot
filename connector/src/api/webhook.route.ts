@@ -1,54 +1,38 @@
-import { z } from "zod";
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import { HttpForwardInboundMessageGateway } from "gateways/impl/http-forward-inbound-message.gateway.js";
 import { HttpSendResponseToUserGateway } from "gateways/impl/http-send-response-to-user.gateway.js";
 import { InboundMessageDispatcherService } from "services/inbound-message-dispatcher.service.js";
+import { WebHookSchema } from "./webhook.schema.js";
+import { authorizeTelegram } from "./authorize-telegram.middleware.js";
 
 const router = Router();
 
-const WebHookSchema = z
-  .object({
-    message_id: z.number(),
-    from: z.object({
-      id: z.number(),
-      first_name: z.string(),
-      last_name: z.string(),
-      is_bot: z.boolean(),
-    }),
-    chat: z.object({
-      id: z.number(),
-    }),
-    date: z.number(),
-    text: z.string(),
-  })
-  .optional();
-
 const sendBackToUser = new HttpSendResponseToUserGateway();
 const forwardInboundMsg = new HttpForwardInboundMessageGateway();
-
 const service = new InboundMessageDispatcherService(
   sendBackToUser,
   forwardInboundMsg
 );
 
-router.post("/", async (req, res) => {
-  const message = req.body.message;
-  console.log("Received message:", message);
+router.use(authorizeTelegram);
 
+router.post("/", async (req: Request, res: Response) => {
   try {
-    const parsedMessage = WebHookSchema.parse(message);
+    const parsedMessage = WebHookSchema.parse(req.body.message);
 
-    if (parsedMessage) {
+    if (parsedMessage.message) {
+      setImmediate
       await service.dispatch({
-        chatId: parsedMessage.chat.id,
-        userId: parsedMessage.from.id.toString(),
-        content: parsedMessage.text,
+        chatId: parsedMessage.message.chat.id,
+        content: parsedMessage.message.text,
+        userId: `${parsedMessage.message.from.id}`,
       });
     }
   } catch (error) {
     console.error("Error dispatching message:", error);
+  } finally {
+    res.sendStatus(204);
   }
-  res.sendStatus(200);
 });
 
 export default router;
