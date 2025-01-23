@@ -14,8 +14,8 @@ prompt = """
     Given an expense description, extract the following:
 
     1. The name or description of the expense (e.g., "Pizza", "Taxi").
-    2. The amount of money spent (e.g., 100) always do an effort to conver to USD dollars or return the numric value by default.
-    3. The category of the expense from the following list: Housing, Transportation, Food, Utilities, Insurance, Medical/Healthcare, Savings, Debt, Education, Entertainment, and Other.
+    2. The amount of money spent (e.g., 100) always do an effort to conver to USD dollars or return the numeric value by default.
+    3. The category of the expense restricted to the following: Housing, Transportation, Food, Utilities, Insurance, Medical/Healthcare, Savings, Debt, Education, Entertainment, Other.
 
     Expense description: "{expense_text}"
 

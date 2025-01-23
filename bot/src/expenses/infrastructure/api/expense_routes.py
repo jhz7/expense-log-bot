@@ -75,6 +75,6 @@ async def register_expense(
     expense = await service.from_message(message)
 
     if not expense:
-        return
+        return {"message": None}
 
     return {"message": f"{expense.details.category.name} expense added ✅"}

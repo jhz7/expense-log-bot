@@ -10,7 +10,7 @@ type RequestDto = {
   user_external_id: string;
 };
 
-const responseSchema = z.object({
+const ResponseSchema = z.object({
   message: z.string().nullable(),
 });
 
@@ -20,7 +20,7 @@ export class HttpForwardInboundMessageGateway
   implements ForwardInboundMessageGateway
 {
   forward = async (message: InboundMessage): Promise<string | undefined> => {
-    const response = await fetch(`${BOT_SERVICE_URL}/expenses`, {
+    const response = await fetch(BOT_SERVICE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(<RequestDto>{
@@ -29,7 +29,7 @@ export class HttpForwardInboundMessageGateway
       }),
     }).then((res) => res.json());
 
-    const { message: result } = responseSchema.parse(response);
+    const { message: result } = ResponseSchema.parse(response);
 
     return result || undefined;
   };
