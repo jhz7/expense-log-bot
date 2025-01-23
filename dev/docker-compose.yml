@@ -1,0 +1,41 @@
+services:
+  cache:
+    image: redis:8.0-M03-alpine
+    container_name: redis-cache-queue
+    profiles:
+      - just-connector
+      - just-expenses-bot
+      - full-expenses-bot
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+  database:
+    image: 'postgres:17-alpine'
+    container_name: 'bot-db'
+    profiles:
+      - just-expenses-bot
+      - full-expenses-bot
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_PASSWORD: postgres
+  connector:
+    container_name: connector
+    profiles:
+      - just-connector
+      - full-expenses-bot
+    build:
+      context: ../connector/.
+      dockerfile: Dockerfile
+    volumes:
+      - '../connector/src/.:/usr/src/app/src/.'
+    ports:
+      - '3000:3000'
+    command: npm run dev
+    links:
+      - cache
+    depends_on:
+      - cache
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
