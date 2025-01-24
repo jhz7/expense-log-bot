@@ -9,20 +9,23 @@ from src.shared.errors.technical import TechnicalError
 from src.shared.logging.log import Logger
 
 load_dotenv()
-__cohere_api_key = os.environ.get("COHERE_API_KEY")
-model = Cohere(cohere_api_key=__cohere_api_key, max_tokens=256, temperature=0.75)
+COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 
 logger = Logger(__name__)
 
 
 class LangChainCohereTextGenerator(LLM):
+    def __init__(self):
+        super().__init__()
+        self.model = Cohere(cohere_api_key=COHERE_API_KEY, max_tokens=256, temperature=0.75)
+
     async def generate(self, prompt: str, input: dict) -> str:
         try:
             prompt_template = PromptTemplate(
                 template=prompt,
                 input_variables=list(input.keys()),
             )
-            chain = prompt_template | model
+            chain = prompt_template | self.model
 
             msg = await to_thread(chain.invoke, input)
 

@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+import os
+from dotenv import load_dotenv
 
 from src.users.use_cases.user_query import UserQueryHandler
 from src.users.infrastructure.persistence.postgres.postgres_user_repository import (
@@ -28,6 +29,11 @@ from src.shared.pubsub.impl.redis_subscriber import RedisSubscriber
 from src.shared.pubsub.impl.redis_publisher import RedisPublisher
 from src.shared.logging.log import Logger
 
+load_dotenv()
+
+INBOUND_MSG_SUB = os.getenv("INBOUND_MSG_SUB")
+OUTBOUND_MSG_SUB = os.getenv("OUTBOUND_MSG_SUB")
+
 logger = Logger(__name__)
 
 
@@ -43,9 +49,7 @@ class InboundMessageExpenseSubscriber:
         self.register_expense = register_expense
 
     async def run(self) -> None:
-        await self.subscriber.subscribe(
-            "async-handle-inbound-message", self.__message_handler
-        )
+        await self.subscriber.subscribe(INBOUND_MSG_SUB, self.__message_handler)
 
     async def __message_handler(self, message: str) -> None:
         logger.info(f"Message received {message}")
@@ -63,7 +67,7 @@ class InboundMessageExpenseSubscriber:
 
         if expense:
             await self.publisher.publish(
-                "async-handle-outbound-message",
+                OUTBOUND_MSG_SUB,
                 data={
                     "chatId": chatId,
                     "message": f"{expense.details.category.name} expense added ✅",

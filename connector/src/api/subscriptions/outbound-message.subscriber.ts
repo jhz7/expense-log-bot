@@ -2,6 +2,12 @@ import { SendResponseToUserGateway } from "gateways/send-response-to-user.gatewa
 import { Subscriber } from "shared/pubsub/subscriber.js";
 import { z } from "zod";
 
+const OUTBOUND_MSG_SUB = process.env.OUTBOUND_MSG_SUB;
+
+if (!OUTBOUND_MSG_SUB) {
+  throw new Error("OUTBOUND_MSG_SUB env varibale is required");
+}
+
 const Schema = z.object({
   chatId: z.number(),
   message: z.string(),
@@ -14,7 +20,7 @@ export class OutboundMessageSubscriber {
   ) {}
 
   run = async (): Promise<void> => {
-    await this.subscriber.subscribe("async-handle-outbound-message", (data) =>
+    await this.subscriber.subscribe(OUTBOUND_MSG_SUB!, (data) =>
       this.messageHandler(data)
     );
   };
