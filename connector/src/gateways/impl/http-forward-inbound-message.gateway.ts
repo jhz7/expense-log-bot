@@ -20,7 +20,7 @@ export class HttpForwardInboundMessageGateway
   implements ForwardInboundMessageGateway
 {
   forward = async (message: InboundMessage): Promise<string | undefined> => {
-    const response = await fetch(BOT_SERVICE_URL, {
+    const response = await fetch('http://'+BOT_SERVICE_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(<RequestDto>{

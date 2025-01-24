@@ -3,13 +3,12 @@ services:
     image: redis:8.0-M03-alpine
     container_name: redis-cache-queue
     profiles:
-      - just-connector
       - just-expenses-bot
       - full-expenses-bot
     ports:
       - '6379:6379'
     command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
-  database:
+  bot-db:
     image: 'postgres:17-alpine'
     container_name: 'bot-db'
     profiles:
@@ -18,11 +17,12 @@ services:
     ports:
       - '5432:5432'
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
   connector:
     container_name: connector
     profiles:
-      - just-connector
       - full-expenses-bot
     build:
       context: ../connector/.
@@ -33,9 +33,39 @@ services:
       - '3000:3000'
     command: npm run dev
     links:
+      - bot
       - cache
     depends_on:
+      - bot
       - cache
     environment:
       - NODE_ENV=development
       - PORT=3000
+  bot:
+    container_name: bot
+    profiles:
+      - just-expenses-bot
+      - full-expenses-bot
+    build:
+      context: ../bot/.
+      dockerfile: Dockerfile
+    volumes:
+      - '../bot/src/.:/usr/src/app/src/.'
+    ports:
+      - '8000:8000'
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    links:
+      - cache
+      - bot-db
+    depends_on:
+      - cache
+      - bot-db
+    environment:
+      - PYTHON_ENV=development
+      - PORT=8000
+      - DB_HOST=bot-db
+      - DB_PORT=5432
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - COHERE_API_KEY=vI7KXwwnad2LdrYHv208QHcyu5fIELCsv8J76pz9

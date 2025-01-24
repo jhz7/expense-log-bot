@@ -13,7 +13,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
-RUN chown -R node:node /usr/src//app
+RUN chown -R node:node /usr/src/app
 
 # Switch to the "node" user
 USER node

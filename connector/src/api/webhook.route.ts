@@ -18,10 +18,10 @@ router.use(authorizeTelegram);
 
 router.post("/", async (req: Request, res: Response) => {
   try {
-    const parsedMessage = WebHookSchema.parse(req.body.message);
+    const parsedMessage = WebHookSchema.parse(req.body);
+    console.log("Webhook message received:", parsedMessage);
 
     if (parsedMessage.message) {
-      setImmediate
       await service.dispatch({
         chatId: parsedMessage.message.chat.id,
         content: parsedMessage.message.text,

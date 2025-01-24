@@ -27,7 +27,7 @@ class PostgresUserRepository(UserRepository):
 
         raise error
 
-    async def find(self, external_id: int) -> User | None:
+    async def find(self, external_id: str) -> User | None:
         try:
             async with self.db_pool.acquire() as conn:
                 rows = await conn.fetch(

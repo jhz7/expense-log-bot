@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const WebHookSchema = z.object({
-  update_id: z.number(),
   message: z
     .object({
       message_id: z.number(),
