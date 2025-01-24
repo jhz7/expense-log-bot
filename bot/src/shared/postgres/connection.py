@@ -36,7 +36,7 @@ async def close_db():
         print("🔌 Database connection closed")
 
 
-async def get_connection_pool() -> Pool:
+def get_connection_pool() -> Pool:
     if db_pool is None:
         raise Exception("Database pool is not initialized")
 

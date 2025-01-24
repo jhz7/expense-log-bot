@@ -23,7 +23,6 @@ from src.expenses.infrastructure.persistence.postgres.postgres_message_process_r
 from src.shared.postgres.connection import get_connection_pool
 from src.shared.llm.impl.langchain_coherence_llm import LangChainCohereTextGenerator
 
-
 def get_user_query_handler(db_pool=Depends(get_connection_pool)):
     user_repository = PostgresUserRepository(db_pool)
     user_query_handler = UserQueryHandler(user_repository)
