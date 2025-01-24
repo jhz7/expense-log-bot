@@ -1,5 +1,6 @@
 import express from "express";
-import webhookRoute from "./api/webhook.route.js"; // Import the route
+import webhookRoute from "./api/webhook.route.js";
+import "api/subscriptions/loader.js";
 
 const app = express();
 app.use(express.json());

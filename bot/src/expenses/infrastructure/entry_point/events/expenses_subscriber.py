@@ -48,10 +48,10 @@ class InboundMessageExpenseSubscriber:
         )
 
     async def __message_handler(self, message: str) -> None:
-        logger.info(f"Message3 received {message}")
+        logger.info(f"Message received {message}")
 
         message_dict = json.loads(message)
-        chatId = message_dict.get("chatId")
+        chatId = message_dict.get("chat_id")
         message = message_dict.get("message")
         user_external_id = message_dict.get("user_external_id")
 

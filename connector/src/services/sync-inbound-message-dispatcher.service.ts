@@ -1,16 +1,16 @@
 import {
-  ForwardInboundMessageGateway,
+  SyncForwardInboundMessageGateway,
   InboundMessage,
-} from "gateways/forward-inbound-message.gateway.js";
+} from "gateways/sync-forward-inbound-message.gateway.js";
 import {
   OutboundMessage,
   SendResponseToUserGateway,
 } from "gateways/send-response-to-user.gateway.js";
 
-export class InboundMessageDispatcherService {
+export class SyncInboundMessageDispatcherService {
   constructor(
     private readonly sendResponseToUser: SendResponseToUserGateway,
-    private readonly forwardInboundMessage: ForwardInboundMessageGateway
+    private readonly forwardInboundMessage: SyncForwardInboundMessageGateway
   ) {}
 
   async dispatch({

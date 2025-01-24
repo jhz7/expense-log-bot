@@ -3,6 +3,6 @@ export type InboundMessage = {
   content: string;
 };
 
-export interface ForwardInboundMessageGateway {
+export interface SyncForwardInboundMessageGateway {
   forward(message: InboundMessage): Promise<string | undefined>;
 }

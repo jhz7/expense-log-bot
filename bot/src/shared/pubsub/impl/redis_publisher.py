@@ -1,5 +1,4 @@
 import json
-import asyncio
 
 from src.shared.logging.log import Logger
 from src.shared.redis.connection_factory import get_connection
@@ -19,9 +18,7 @@ class RedisPublisher(Publisher):
                 f"About to dispatch a message: subs={subscription}, data={data}"
             )
 
-            await asyncio.to_thread(
-                self.connection.publish(subscription, json.dumps(data))
-            )
+            await self.connection.publish(subscription, json.dumps(data))
         except Exception as e:
             error = TechnicalError(
                 code="RedisPublisherError",
