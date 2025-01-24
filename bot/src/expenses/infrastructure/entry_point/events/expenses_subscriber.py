@@ -23,14 +23,22 @@ from src.shared.llm.impl.langchain_coherence_llm import LangChainCohereTextGener
 
 import json
 from src.shared.pubsub.subscriber import Subscriber
+from src.shared.pubsub.publisher import Publisher
 from src.shared.pubsub.impl.redis_subscriber import RedisSubscriber
+from src.shared.pubsub.impl.redis_publisher import RedisPublisher
 from src.shared.logging.log import Logger
 
 logger = Logger(__name__)
 
 
 class InboundMessageExpenseSubscriber:
-    def __init__(self, subscriber: Subscriber, register_expense: RegisterUserExpense):
+    def __init__(
+        self,
+        publisher: Publisher,
+        subscriber: Subscriber,
+        register_expense: RegisterUserExpense,
+    ):
+        self.publisher = publisher
         self.subscriber = subscriber
         self.register_expense = register_expense
 
@@ -53,6 +61,15 @@ class InboundMessageExpenseSubscriber:
 
         expense = await self.register_expense.from_message(request=request)
 
+        if expense:
+            await self.publisher.publish(
+                "async-handle-outbound-message",
+                data={
+                    "chatId": chatId,
+                    "message": f"{expense.details.category.name} expense added ✅",
+                },
+            )
+
 
 def inboundMessageProcessor():
     db_pool = get_connection_pool()
@@ -64,6 +81,7 @@ def inboundMessageProcessor():
 
     return InboundMessageExpenseSubscriber(
         subscriber=RedisSubscriber(),
+        publisher=RedisPublisher(),
         register_expense=RegisterUserExpense(
             users=user_query_handler,
             expenses=expenses_repository,

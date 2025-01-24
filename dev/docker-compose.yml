@@ -41,6 +41,9 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3000
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
   bot:
     container_name: bot
     profiles:
@@ -68,4 +71,7 @@ services:
       - DB_NAME=postgres
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+      - REDIS_HOST=cache
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
       - COHERE_API_KEY=vI7KXwwnad2LdrYHv208QHcyu5fIELCsv8J76pz9

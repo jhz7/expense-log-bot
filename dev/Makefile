@@ -11,7 +11,7 @@ logs.connector:
 	docker-compose logs -f connector
 
 logs.db:
-	docker-compose logs -f database
+	docker-compose logs -f bot-db
 
 logs.cache:
 	docker-compose logs -f cache
