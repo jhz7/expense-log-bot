@@ -1,20 +1,20 @@
 # Bot server
 
-Acts as a proxy service forwarding inbpund message to the Bot Server and then sending its response back to the user.
+Core service. Process inbound messages:
+- Sends to a LLM asking for extracting expense details
+- Sends back a response about the expense processed
+- Keeps track of the processed messages with their results for further audit process 
 
 ## Set up
 
 ### LLM
 
-- Once you have configured the telegram bot and already obtained the bot API key. Create the webhook [Instructions here](https://core.telegram.org/bots/api#setwebhook)
+- This implementation uses Cohere model [details here](https://dashboard.cohere.com/). It offers a free tier enough for this challenge.
 
-- Create a secret string. Something like a [UUID](https://www.uuidgenerator.net/) can help. This secret it's going to be sent to Telegram when creating the webhook, Telegram will send it to you on every request, so, you can validated and authorize.
-
-  bash`curl -X POST "https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook?url=<YOUR_WEBHOOK_URL>&secret_token=<YOUR_CREATED_SECRET>"`
-
-- Ensure setting your Telegram Bot API key and your created secret in the .env file. Or pass this values as ENV variables directy to NodeJS when running.
+- Once you get registered, generates an API key and set it to the `.env` file.
 
 ### Server
+For local code adjustments
 
 - This project requires [Python](https://www.python.org/downloads/) version 3.10+ installation
 - After installation. Optionally create a virtual env. Open a terminal and run
