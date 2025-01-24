@@ -70,7 +70,6 @@ CREATE INDEX processed_msg_user_idx ON processed_messages(user_id);
 
 ### Proposed enhacements
 
-- Keep track of processed messages, dealing with duplicated messages from Redis.
 - Build a full featured UI whose feed is the user expenses, graphics, etc.
 - Add and drop users to the whitelist automatically.
   - Maybe from the same bot.
