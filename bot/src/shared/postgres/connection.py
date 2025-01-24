@@ -1,3 +1,4 @@
+import asyncio
 import asyncpg
 from asyncpg import Pool
 
@@ -17,16 +18,24 @@ db_pool = None
 
 async def init_db():
     global db_pool
-    db_pool = await asyncpg.create_pool(
-        user=DB_USER,
-        password=DB_PASSWORD,
-        database=DB_NAME,
-        host=DB_HOST,
-        port=DB_PORT,
-        min_size=1,
-        max_size=10,
-    )
-    print("✅ Database connected successfully!")
+    max_attempts = 5
+    for attempt in range(max_attempts):
+        try:
+            db_pool = await asyncpg.create_pool(
+                user=DB_USER,
+                password=DB_PASSWORD,
+                database=DB_NAME,
+                host=DB_HOST,
+                port=DB_PORT,
+                min_size=1,
+                max_size=10,
+            )
+            print("✅ Database connected successfully!")
+            return
+        except Exception as e:
+            print(f"❌ Attempt {attempt+1} failed: {e}")
+            await asyncio.sleep(5)
+    print("🚨 Could not connect to the database after retries!")
 
 
 async def close_db():
