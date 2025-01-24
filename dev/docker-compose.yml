@@ -71,14 +71,17 @@ services:
     environment:
       - PYTHON_ENV=development
       - PORT=8000
+
       - DB_HOST=bot-db
       - DB_PORT=5432
       - DB_NAME=postgres
       - DB_USER=postgres
       - DB_PASSWORD=postgres
+
       - REDIS_HOST=cache
       - REDIS_PORT=6379
       - REDIS_PASSWORD=eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+
       - COHERE_API_KEY=vI7KXwwnad2LdrYHv208QHcyu5fIELCsv8J76pz9
       - INBOUND_MSG_SUB=async-handle-inbound-message
       - OUTBOUND_MSG_SUB=async-handle-outbound-message
