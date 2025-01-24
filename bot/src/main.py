@@ -1,6 +1,17 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import asyncio
+import os
+
+from dotenv import load_dotenv
+
+PYTHON_ENV = os.getenv("PYTHON_ENV")
+
+env_file = (
+    "/usr/src/app/.dev.env" if PYTHON_ENV == "development" else "/usr/src/app/.env"
+)
+
+load_dotenv(env_file)
 
 from src.expenses.infrastructure.entry_point.http.expense_routes import (
     router as expenses_router,

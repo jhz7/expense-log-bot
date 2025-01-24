@@ -23,6 +23,3 @@ COPY --chown=node:node . .
 
 # Install dependencies (use --only=production for smaller images if needed)
 RUN npm install
-
-# Command to run the app
-CMD ["npm", "run", "start"]

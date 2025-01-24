@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 from asyncio.threads import to_thread
 from langchain_community.llms.cohere import Cohere
 from langchain_core.prompts import PromptTemplate
@@ -8,7 +7,6 @@ from src.shared.llm.llm import LLM
 from src.shared.errors.technical import TechnicalError
 from src.shared.logging.log import Logger
 
-load_dotenv()
 COHERE_API_KEY = os.getenv("COHERE_API_KEY")
 
 logger = Logger(__name__)
@@ -17,7 +15,9 @@ logger = Logger(__name__)
 class LangChainCohereTextGenerator(LLM):
     def __init__(self):
         super().__init__()
-        self.model = Cohere(cohere_api_key=COHERE_API_KEY, max_tokens=256, temperature=0.75)
+        self.model = Cohere(
+            cohere_api_key=COHERE_API_KEY, max_tokens=256, temperature=0.75
+        )
 
     async def generate(self, prompt: str, input: dict) -> str:
         try:

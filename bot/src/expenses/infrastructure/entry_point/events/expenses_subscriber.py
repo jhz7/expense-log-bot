@@ -1,5 +1,4 @@
 import os
-from dotenv import load_dotenv
 
 from src.users.use_cases.user_query import UserQueryHandler
 from src.users.infrastructure.persistence.postgres.postgres_user_repository import (
@@ -29,7 +28,6 @@ from src.shared.pubsub.impl.redis_subscriber import RedisSubscriber
 from src.shared.pubsub.impl.redis_publisher import RedisPublisher
 from src.shared.logging.log import Logger
 
-load_dotenv()
 
 INBOUND_MSG_SUB = os.getenv("INBOUND_MSG_SUB")
 OUTBOUND_MSG_SUB = os.getenv("OUTBOUND_MSG_SUB")
