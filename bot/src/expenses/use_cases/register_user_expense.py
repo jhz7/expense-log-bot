@@ -34,7 +34,10 @@ class RegisterUserExpense:
     async def from_message(
         self, request: RegisterUserExpenseRequest
     ) -> NewExpense | None:
-        found_user = await self.users.get(request.user_external_id)
+        found_user = await self.users.find(request.user_external_id)
+
+        if not found_user:
+            return None
 
         message = Message(user_id=found_user.id, content=request.message)
 
