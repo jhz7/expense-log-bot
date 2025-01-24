@@ -1,4 +1,5 @@
 export type InboundMessage = {
+  messageId: string;
   userId: string;
   content: string;
 };

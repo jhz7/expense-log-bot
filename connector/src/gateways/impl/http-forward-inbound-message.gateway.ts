@@ -7,6 +7,7 @@ import {
 
 type RequestDto = {
   message: string;
+  message_id: string;
   user_external_id: string;
 };
 
@@ -25,6 +26,7 @@ export class HttpForwardInboundMessageGateway
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(<RequestDto>{
         message: message.content,
+        message_id: message.messageId,
         user_external_id: message.userId,
       }),
     }).then((res) => res.json());

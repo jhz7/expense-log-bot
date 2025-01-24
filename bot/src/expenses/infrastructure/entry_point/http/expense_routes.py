@@ -23,6 +23,7 @@ from src.expenses.infrastructure.persistence.postgres.postgres_message_process_r
 from src.shared.postgres.connection import get_connection_pool
 from src.shared.llm.impl.langchain_coherence_llm import LangChainCohereTextGenerator
 
+
 def get_user_query_handler(db_pool=Depends(get_connection_pool)):
     user_repository = PostgresUserRepository(db_pool)
     user_query_handler = UserQueryHandler(user_repository)
@@ -50,6 +51,7 @@ router = APIRouter()
 
 class ExpenseLogRequest(BaseModel):
     message: str
+    message_id: str
     user_external_id: str
 
 
@@ -62,7 +64,9 @@ async def register_expense(
     expense_details_service=Depends(get_expenses_details_service),
 ):
     message = RegisterUserExpenseRequest(
-        message=request.message, user_external_id=request.user_external_id
+        message=request.message,
+        message_id=request.message_id,
+        user_external_id=request.user_external_id,
     )
     service = RegisterUserExpense(
         users=user_query,

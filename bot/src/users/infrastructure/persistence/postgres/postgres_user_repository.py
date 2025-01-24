@@ -35,7 +35,7 @@ class PostgresUserRepository(UserRepository):
                     external_id,
                 )
 
-                if not rows or len(rows) == 0:
+                if not bool(rows):
                     return None
 
                 row = rows[0]

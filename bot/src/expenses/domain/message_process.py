@@ -7,6 +7,7 @@ from datetime import datetime
 
 @dataclass
 class Message:
+    id: str
     user_id: int
     content: str
 
@@ -44,21 +45,25 @@ class MassageProcessFailed(MassageProcessResult):
 
 
 @dataclass
-class MassageProcess:
+class ProcessedMassage:
     message: Message
     result: MassageProcessResult
     at: datetime = datetime.now()
 
     @staticmethod
-    def succeed(message: Message, expense_id: int) -> "MassageProcess":
-        return MassageProcess(message, MassageProcessSucceed(expense_id))
+    def succeed(message: Message, expense_id: int) -> "ProcessedMassage":
+        return ProcessedMassage(message, MassageProcessSucceed(expense_id))
 
     @staticmethod
-    def failed(message: Message, error: str) -> "MassageProcess":
-        return MassageProcess(message, MassageProcessFailed(error))
+    def failed(message: Message, error: str) -> "ProcessedMassage":
+        return ProcessedMassage(message, MassageProcessFailed(error))
 
 
 class MassageProcessRepository(ABC):
     @abstractmethod
-    async def add(self, message_process: MassageProcess) -> None:
+    async def exists(self, message_id: str) -> bool:
+        pass
+
+    @abstractmethod
+    async def add(self, message_process: ProcessedMassage) -> None:
         pass

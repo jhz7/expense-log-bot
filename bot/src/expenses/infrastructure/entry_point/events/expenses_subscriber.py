@@ -55,12 +55,14 @@ class InboundMessageExpenseSubscriber:
         logger.info(f"Message received {message}")
 
         message_dict = json.loads(message)
-        chatId = message_dict.get("chat_id")
+
+        chat_id = message_dict.get("chat_id")
         message = message_dict.get("message")
+        message_id = message_dict.get("message_id")
         user_external_id = message_dict.get("user_external_id")
 
         request = RegisterUserExpenseRequest(
-            message=message, user_external_id=user_external_id
+            message=message, message_id=message_id, user_external_id=user_external_id
         )
 
         expense = await self.register_expense.from_message(request=request)
@@ -69,7 +71,7 @@ class InboundMessageExpenseSubscriber:
             await self.publisher.publish(
                 OUTBOUND_MSG_SUB,
                 data={
-                    "chatId": chatId,
+                    "chatId": chat_id,
                     "message": f"{expense.details.category.name} expense added ✅",
                 },
             )

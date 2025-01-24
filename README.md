@@ -52,15 +52,14 @@ CREATE TABLE expenses (
   "added_at" timestamp NOT NULL
 );
 
-CREATE TABLE message_processing (
-	"id" SERIAL PRIMARY KEY,
+CREATE TABLE processed_messages (
+	"id" varchar(50) PRIMARY KEY,
 	"user_id" integer NOT NULL REFERENCES users("id"),
-	message_content text NOT NULL,
-	result JSON NOT NULL,
-	added_at timestamp NOT NULL
+	"message_content" text NOT NULL,
+	"result" JSON NOT NULL,
+	"added_at" timestamp NOT NULL
 );
-
-CREATE INDEX msg_user_idx ON message_processing(user_id);
+CREATE INDEX processed_msg_user_idx ON processed_messages(user_id);
 ```
 
 ### Telegram

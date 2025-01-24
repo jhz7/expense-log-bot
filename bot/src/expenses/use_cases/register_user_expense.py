@@ -7,7 +7,7 @@ from src.expenses.use_cases.services.expense_details_from_message import (
 )
 from src.expenses.domain.message_process import (
     Message,
-    MassageProcess,
+    ProcessedMassage,
     MassageProcessRepository,
 )
 
@@ -15,6 +15,7 @@ from src.expenses.domain.message_process import (
 @dataclass
 class RegisterUserExpenseRequest:
     message: str
+    message_id: str
     user_external_id: str
 
 
@@ -39,7 +40,14 @@ class RegisterUserExpense:
         if not found_user:
             return None
 
-        message = Message(user_id=found_user.id, content=request.message)
+        has_been_processed = await self.messages.exists(message_id=request.message_id)
+
+        if has_been_processed:
+            return None
+
+        message = Message(
+            id=request.message_id, user_id=found_user.id, content=request.message
+        )
 
         try:
             expense_details_or_generated_text = (
@@ -48,7 +56,7 @@ class RegisterUserExpense:
 
             if not isinstance(expense_details_or_generated_text, ExpenseDetails):
                 generated_text = expense_details_or_generated_text
-                message_process_result = MassageProcess.failed(
+                message_process_result = ProcessedMassage.failed(
                     message=message,
                     error=f"No parsed message: generated_text {generated_text}",
                 )
@@ -63,13 +71,13 @@ class RegisterUserExpense:
 
             expense_id = await self.expenses.add(new_expense)
 
-            message_process_result = MassageProcess.succeed(
+            message_process_result = ProcessedMassage.succeed(
                 message=message, expense_id=expense_id
             )
 
             return new_expense
         except Exception as e:
-            message_process_result = MassageProcess.failed(
+            message_process_result = ProcessedMassage.failed(
                 message=message, error=str(e)
             )
 
