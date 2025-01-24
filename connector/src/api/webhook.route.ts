@@ -3,12 +3,17 @@ import { WebHookSchema } from "./webhook.schema.js";
 import { authorizeTelegram } from "./authorize-telegram.middleware.js";
 import { AsyncInboundMessageDispatcherService } from "services/async-inbound-message-dispatcher.service.js";
 import { RedisPublisher } from "shared/pubsub/impl/redis.publisher.js";
+import { UlidIdGenerator } from "shared/id/impl/ulid-id.generator.js";
 
 const router = Router();
 
 const publisher = new RedisPublisher();
+const idGenerator = new UlidIdGenerator();
 
-const service = new AsyncInboundMessageDispatcherService(publisher);
+const service = new AsyncInboundMessageDispatcherService(
+  publisher,
+  idGenerator
+);
 
 router.use(authorizeTelegram);
 
