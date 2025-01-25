@@ -1,8 +1,8 @@
 # The customer expenses log
 
-This is the challenge code for DarwingAI. The full details and requirements [here](./public/SWE%20Seniority%20Test.pdf).
+This is the code challenge for DarwinAI. The full details and requirements [here](./public/SWE%20Seniority%20Test.pdf).
 
-The most general implentation requirements ask for:
+The most general implentation requirements asks for:
 
 - Implementing a NodeJS connector application to serve as a proxy between Telegram and the [Bot server](./bot/README.md)
 
@@ -53,11 +53,11 @@ CREATE TABLE expenses (
 );
 
 CREATE TABLE processed_messages (
-	"id" varchar(50) PRIMARY KEY,
-	"user_id" integer NOT NULL REFERENCES users("id"),
-	"message_content" text NOT NULL,
-	"result" JSON NOT NULL,
-	"added_at" timestamp NOT NULL
+  "id" varchar(50) PRIMARY KEY,
+  "user_id" integer NOT NULL REFERENCES users("id"),
+  "message_content" text NOT NULL,
+  "result" JSON NOT NULL,
+  "added_at" timestamp NOT NULL
 );
 CREATE INDEX processed_msg_user_idx ON processed_messages(user_id);
 ```
@@ -66,11 +66,11 @@ CREATE INDEX processed_msg_user_idx ON processed_messages(user_id);
 
 - Configure a Telegram Bot to get your own bot API key [instructions here](https://core.telegram.org/bots/tutorial)
 
-- In the Telegram App look up for the `userinfobot` to get your Telegram user ID. Put this ID into the `users` table; this table is the users witelist, allowed to execute the application.
+- In the Telegram App, look up for the `userinfobot` to get your Telegram user ID. Put this ID into the `users` table. This table is the users whitelist, allowed to execute the application.
 
 ### Proposed enhacements
 
-- Build a full featured UI whose feed is the user expenses, graphics, etc.
+- Build a full featured UI whose feed is the user expenses log, add graphics, insights, etc.
 - Add and drop users to the whitelist automatically.
   - Maybe from the same bot.
   - Maybe after some payment.
